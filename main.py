@@ -97,12 +97,21 @@ for file in os.listdir(resumes_folder):
             "Total Score": total_score
         })
 
-# Step 4: Filter resumes based on employer criteria
+# Step 4: Filter resumes based on employer criteria (robust version)
 filtered_results = []
+
 for r in results:
-    if r["Work Experience (yrs)"] >= criteria["min_experience"] and \
-       r["Education"] in criteria["education"] and \
-       all(skill in r["Matched Skills"] for skill in criteria["skills"]):
+    # Convert matched skills to lowercase list
+    matched_skills_list = [s.strip().lower() for s in r["Matched Skills"].split(",")]
+
+    # Check skills (case-insensitive)
+    skills_ok = all(skill.lower() in matched_skills_list for skill in criteria["skills"])
+
+    # Check experience and education
+    exp_ok = r["Work Experience (yrs)"] >= criteria["min_experience"]
+    edu_ok = r["Education"] in criteria["education"]
+
+    if exp_ok and edu_ok and skills_ok:
         filtered_results.append(r)
 
 # Step 5: Sort filtered resumes by total score (highest first)
