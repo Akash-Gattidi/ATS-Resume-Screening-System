@@ -8,3 +8,5 @@ text = extract_text_from_pdf(resume_path)
 
 print("Extracted Text:\n")
 print(text)
+
+cleaned_text = clean_text(text)
