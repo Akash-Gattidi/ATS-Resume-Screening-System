@@ -1,4 +1,5 @@
 import os
+import csv
 from src.parser import extract_text_from_pdf
 from src.preprocess import clean_text
 from src.matcher import match_skills
@@ -8,6 +9,9 @@ resumes_folder = "data/"
 
 # Job required skills (for now hardcoded, later from dashboard)
 required_skills = ["Python", "Java", "Machine Learning", "SQL", "React"]
+
+# List to store results for CSV
+results = []
 
 # Process each resume in the folder
 for file in os.listdir(resumes_folder):
@@ -23,7 +27,21 @@ for file in os.listdir(resumes_folder):
         # Step 3: Match skills
         matched_skills, score = match_skills(cleaned_text, required_skills)
         
-        # Step 4: Output
-        print(f"\nResume: {file}")
-        print("Matched Skills:", matched_skills)
-        print("Score:", score, "%")
+        # Store results
+        results.append({
+            "Resume": file,
+            "Matched Skills": ", ".join(matched_skills),
+            "Score": score
+        })
+
+# Step 4: Save results to CSV
+output_file = "screening_results.csv"
+with open(output_file, "w", newline="") as csvfile:
+    fieldnames = ["Resume", "Matched Skills", "Score"]
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    
+    writer.writeheader()
+    for row in results:
+        writer.writerow(row)
+
+print(f"\nScreening complete! Results saved to {output_file}")
