@@ -10,8 +10,6 @@ resumes_folder = "data/"
 
 # Employer requirements (demo)
 required_skills = ["Python", "Java", "Machine Learning", "MySQL", "React"]
-required_experience = 2  # minimum years
-desired_education = ["B.Tech", "M.Tech"]
 required_certifications = ["NPTEL Java"]  # optional
 
 # Weights (percent)
@@ -20,13 +18,6 @@ weights = {
     "experience": 20,
     "education": 20,
     "certification": 10
-}
-
-# Employer criteria for filtering
-criteria = {
-    "min_experience": 2,
-    "education": desired_education,
-    "skills": ["Python", "React"]  # must-have skills
 }
 
 # Helper functions to parse resume content
@@ -80,9 +71,9 @@ for file in os.listdir(resumes_folder):
         edu = extract_education(cleaned_text)
         certs = extract_certifications(cleaned_text)
 
-        # Step 3: Compute scores
-        exp_score = weights["experience"] if exp >= required_experience else 0
-        edu_score = weights["education"] if edu in desired_education else 0
+        # Step 3: Compute scores (include all even if exp/edu missing)
+        exp_score = weights["experience"] if exp > 0 else 0
+        edu_score = weights["education"] if edu != "Unknown" else 0
         cert_score = weights["certification"] if any(c in required_certifications for c in certs) else 0
 
         # Total combined score
@@ -97,24 +88,10 @@ for file in os.listdir(resumes_folder):
             "Total Score": total_score
         })
 
-# Step 4: Filter resumes based on employer criteria (robust version)
-filtered_results = []
+# Step 4: For testing, include all resumes without filtering
+filtered_results = results
 
-for r in results:
-    # Convert matched skills to lowercase list
-    matched_skills_list = [s.strip().lower() for s in r["Matched Skills"].split(",")]
-
-    # Check skills (case-insensitive)
-    skills_ok = all(skill.lower() in matched_skills_list for skill in criteria["skills"])
-
-    # Check experience and education
-    exp_ok = r["Work Experience (yrs)"] >= criteria["min_experience"]
-    edu_ok = r["Education"] in criteria["education"]
-
-    if exp_ok and edu_ok and skills_ok:
-        filtered_results.append(r)
-
-# Step 5: Sort filtered resumes by total score (highest first)
+# Step 5: Sort by total score
 filtered_results.sort(key=lambda x: x["Total Score"], reverse=True)
 
 # Step 6: Save to CSV
@@ -126,4 +103,4 @@ with open(output_file, "w", newline="") as csvfile:
     for row in filtered_results:
         writer.writerow(row)
 
-print(f"\nScreening complete! Filtered and ranked results saved to {output_file}")
+print(f"\nScreening complete! All resumes saved to {output_file} (testing mode, no filters applied)")
