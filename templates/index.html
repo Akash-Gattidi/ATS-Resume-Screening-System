@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ATS Dashboard</title>
+</head>
+<body>
+
+<h2>ATS Resume Screening</h2>
+
+<form action="/run" method="post">
+    Skills (comma separated):<br>
+    <input type="text" name="skills"><br><br>
+
+    Minimum Experience:<br>
+    <input type="number" name="experience"><br><br>
+
+    Education:<br>
+    <input type="text" name="education"><br><br>
+
+    <input type="submit" value="Run Screening">
+</form>
+
+{% if results %}
+    <h3>Results:</h3>
+
+    <table border="1" cellpadding="10">
+        <tr>
+            <th>Resume</th>
+            <th>Experience</th>
+            <th>Education</th>
+            <th>Skills</th>
+            <th>Score</th>
+        </tr>
+
+        {% for r in results %}
+        <tr>
+            <td>{{ r["Resume"] }}</td>
+            <td>{{ r["Experience"] }}</td>
+            <td>{{ r["Education"] }}</td>
+            <td>{{ r["Skills"] }}</td>
+            <td>{{ r["Score"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endif %}
+
+</body>
+</html>
